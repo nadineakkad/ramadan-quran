@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Ramadan Quran Schedule</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Quran 30">
+  <meta name="theme-color" content="#0f2b24">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8d491;
+      --green-dark: #1a3c34;
+      --green-mid: #2d5a4e;
+      --green-light: #3a7566;
+      --bg: #0f2b24;
+      --card-bg: #163029;
+      --card-border: #2a5045;
+      --text: #e8e4dc;
+      --text-dim: #9aafa8;
+      --completed-bg: #1e4a3a;
+      --completed-border: #3a8a6a;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: calc(3rem + env(safe-area-inset-bottom));
+    }
+
+    header {
+      text-align: center;
+      padding: 2.5rem 1rem 1.5rem;
+      background: linear-gradient(180deg, #0a1f1a 0%, var(--bg) 100%);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .bismillah {
+      font-family: 'Amiri', serif;
+      font-size: 1.8rem;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-family: 'Amiri', serif;
+      font-size: 2rem;
+      color: var(--gold-light);
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .subtitle {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    .progress-section {
+      max-width: 700px;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
+    }
+
+    .progress-bar-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .progress-count {
+      font-size: 0.85rem;
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: var(--green-dark);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green-light), var(--gold));
+      border-radius: 5px;
+      transition: width 0.4s ease;
+    }
+
+    .reset-btn {
+      display: block;
+      margin: 0.75rem auto 0;
+      background: none;
+      border: 1px solid var(--card-border);
+      color: var(--text-dim);
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .reset-btn:hover {
+      border-color: #c0392b;
+      color: #e74c3c;
+    }
+
+    /* Tips section */
+    .tips-section {
+      max-width: 700px;
+      margin: 0 auto 1.25rem;
+      padding: 0 1rem;
+    }
+
+    .tips-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .tips-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1.25rem;
+      background: none;
+      border: none;
+      color: var(--gold-light);
+      font-family: 'Amiri', serif;
+      font-size: 1.15rem;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .tips-toggle:hover { background: rgba(255,255,255,0.03); }
+
+    .tips-arrow {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      transition: transform 0.3s;
+    }
+
+    .tips-card.open .tips-arrow { transform: rotate(180deg); }
+
+    .tips-content {
+      display: none;
+      padding: 0 1.25rem 1.25rem;
+    }
+
+    .tips-card.open .tips-content { display: block; }
+
+    .tips-intro {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .tips-intro strong { color: var(--text); }
+
+    .prayer-overview {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .prayer-ov-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 0.7rem;
+      background: var(--green-dark);
+      border-radius: 6px;
+      border-left: 3px solid var(--gold);
+    }
+
+    .prayer-ov-name {
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: var(--text);
+      min-width: 70px;
+    }
+
+    .prayer-ov-desc {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      flex: 1;
+    }
+
+    .tips-note {
+      padding: 0.75rem;
+      background: rgba(201, 168, 76, 0.08);
+      border-radius: 8px;
+      border: 1px solid rgba(201, 168, 76, 0.15);
+      margin-top: 0.5rem;
+    }
+
+    .tips-note p {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    .tips-note strong { color: var(--gold-light); }
+
+    /* Schedule */
+    .schedule {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .day-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      transition: all 0.25s ease;
+      user-select: none;
+      overflow: hidden;
+    }
+
+    .day-card:hover {
+      border-color: var(--green-light);
+      background: #1a3a31;
+    }
+
+    .day-card.completed {
+      background: var(--completed-bg);
+      border-color: var(--completed-border);
+    }
+
+    .day-card.today {
+      border-color: var(--gold);
+      box-shadow: 0 0 12px rgba(201, 168, 76, 0.15);
+    }
+
+    .card-main {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1rem;
+      cursor: pointer;
+    }
+
+    .checkbox {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--card-border);
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s;
+      cursor: pointer;
+    }
+
+    .checkbox:hover {
+      border-color: var(--gold);
+    }
+
+    .day-card.completed .checkbox {
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+
+    .checkmark {
+      display: none;
+      width: 12px;
+      height: 12px;
+    }
+
+    .day-card.completed .checkmark { display: block; }
+
+    .day-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .day-top {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .day-number {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+
+    .day-card.completed .day-number { color: var(--gold-light); }
+
+    .today-badge {
+      display: none;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--gold);
+      color: var(--green-dark);
+      padding: 0.1rem 0.45rem;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .day-card.today .today-badge { display: inline-block; }
+
+    .day-detail {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .day-detail strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .juz-arabic {
+      font-family: 'Amiri', serif;
+      font-size: 1.3rem;
+      color: var(--gold);
+      flex-shrink: 0;
+      text-align: right;
+      min-width: 50px;
+    }
+
+    .day-card.completed .juz-arabic { opacity: 0.6; }
+
+    .expand-arrow {
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      transition: transform 0.3s;
+      flex-shrink: 0;
+      padding: 0.25rem;
+    }
+
+    .day-card.expanded .expand-arrow {
+      transform: rotate(180deg);
+    }
+
+    /* Breakdown panel */
+    .card-breakdown {
+      display: none;
+      padding: 0 1rem 0.85rem;
+      border-top: 1px solid var(--card-border);
+      margin: 0 0.5rem;
+    }
+
+    .day-card.expanded .card-breakdown {
+      display: block;
+    }
+
+    .reading-slot {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .reading-slot:last-child { border-bottom: none; }
+
+    .reading-prayer {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--gold);
+      min-width: 58px;
+    }
+
+    .reading-range {
+      font-size: 0.78rem;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .reading-count {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      white-space: nowrap;
+    }
+
+    .completion-msg {
+      display: none;
+      text-align: center;
+      padding: 2rem 1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .completion-msg.show { display: block; }
+
+    .completion-msg p {
+      font-family: 'Amiri', serif;
+      font-size: 1.4rem;
+      color: var(--gold);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 480px) {
+      .bismillah { font-size: 1.4rem; }
+      h1 { font-size: 1.5rem; }
+      .card-main { padding: 0.75rem 0.85rem; gap: 0.6rem; }
+      .juz-arabic { font-size: 1.1rem; min-width: 40px; }
+      .reading-prayer { min-width: 50px; font-size: 0.65rem; }
+      .reading-range { font-size: 0.72rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+  <h1>Ramadan Quran Schedule</h1>
+  <p class="subtitle">Complete the Quran in 30 days — one Juz per day</p>
+</header>
+
+<div class="progress-section">
+  <div class="progress-bar-container">
+    <div class="progress-header">
+      <span class="progress-label">Progress</span>
+      <span class="progress-count" id="progressCount">0 / 30</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+  </div>
+  <button class="reset-btn" id="resetBtn">Reset Progress</button>
+</div>
+
+<div class="tips-section">
+  <div class="tips-card open" id="tipsCard">
+    <button class="tips-toggle" id="tipsToggle">
+      How To Complete Each Day
+      <span class="tips-arrow">&#9660;</span>
+    </button>
+    <div class="tips-content">
+      <p class="tips-intro">Each day's Juz is split into <strong>5 readings — one per prayer</strong>. Tap any day below to see exactly which verses to read at each salah. The verse numbers are the same in every Quran, every translation, and every app.</p>
+
+      <div class="prayer-overview">
+        <div class="prayer-ov-row">
+          <span class="prayer-ov-name">Fajr</span>
+          <span class="prayer-ov-desc">Longest reading — your mind is fresh, barakah in the morning</span>
+        </div>
+        <div class="prayer-ov-row">
+          <span class="prayer-ov-name">Dhuhr</span>
+          <span class="prayer-ov-desc">Midday reading — break from work or school</span>
+        </div>
+        <div class="prayer-ov-row">
+          <span class="prayer-ov-name">Asr</span>
+          <span class="prayer-ov-desc">Afternoon reading — wind down with reflection</span>
+        </div>
+        <div class="prayer-ov-row">
+          <span class="prayer-ov-name">Maghrib</span>
+          <span class="prayer-ov-desc">Shorter reading — right after iftar</span>
+        </div>
+        <div class="prayer-ov-row">
+          <span class="prayer-ov-name">Isha</span>
+          <span class="prayer-ov-desc">Shorter reading — end your night with Quran</span>
+        </div>
+      </div>
+
+      <div class="tips-note">
+        <p><strong>Tip:</strong> If you miss a prayer slot, double up at the next one. You can also read during Suhoor or listen to a recitation during your commute. The key is consistency, not perfection.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="schedule" id="schedule"></div>
+
+<div class="completion-msg" id="completionMsg">
+  <p>ما شاء الله — تقبل الله<br>You have completed the entire Quran!<br>May Allah accept your recitation.</p>
+</div>
+
+<script>
+// Surah names lookup
+const SN = {
+  1:"Al-Fatiha",2:"Al-Baqarah",3:"Aal-Imran",4:"An-Nisa",5:"Al-Ma'idah",
+  6:"Al-An'am",7:"Al-A'raf",8:"Al-Anfal",9:"At-Tawbah",10:"Yunus",
+  11:"Hud",12:"Yusuf",13:"Ar-Ra'd",14:"Ibrahim",15:"Al-Hijr",
+  16:"An-Nahl",17:"Al-Isra",18:"Al-Kahf",19:"Maryam",20:"Ta-Ha",
+  21:"Al-Anbiya",22:"Al-Hajj",23:"Al-Mu'minun",24:"An-Nur",25:"Al-Furqan",
+  26:"Ash-Shu'ara",27:"An-Naml",28:"Al-Qasas",29:"Al-Ankabut",30:"Ar-Rum",
+  31:"Luqman",32:"As-Sajdah",33:"Al-Ahzab",34:"Saba",35:"Fatir",
+  36:"Ya-Sin",37:"As-Saffat",38:"Sad",39:"Az-Zumar",40:"Ghafir",
+  41:"Fussilat",42:"Ash-Shura",43:"Az-Zukhruf",44:"Ad-Dukhan",45:"Al-Jathiyah",
+  46:"Al-Ahqaf",47:"Muhammad",48:"Al-Fath",49:"Al-Hujurat",50:"Qaf",
+  51:"Adh-Dhariyat",52:"At-Tur",53:"An-Najm",54:"Al-Qamar",55:"Ar-Rahman",
+  56:"Al-Waqi'ah",57:"Al-Hadid",58:"Al-Mujadilah",59:"Al-Hashr",
+  60:"Al-Mumtahanah",61:"As-Saff",62:"Al-Jumu'ah",63:"Al-Munafiqun",
+  64:"At-Taghabun",65:"At-Talaq",66:"At-Tahrim",67:"Al-Mulk",68:"Al-Qalam",
+  69:"Al-Haqqah",70:"Al-Ma'arij",71:"Nuh",72:"Al-Jinn",73:"Al-Muzzammil",
+  74:"Al-Muddaththir",75:"Al-Qiyamah",76:"Al-Insan",77:"Al-Mursalat",
+  78:"An-Naba",79:"An-Nazi'at",80:"Abasa",81:"At-Takwir",82:"Al-Infitar",
+  83:"Al-Mutaffifin",84:"Al-Inshiqaq",85:"Al-Buruj",86:"At-Tariq",87:"Al-A'la",
+  88:"Al-Ghashiyah",89:"Al-Fajr",90:"Al-Balad",91:"Ash-Shams",92:"Al-Layl",
+  93:"Ad-Duha",94:"Ash-Sharh",95:"At-Tin",96:"Al-Alaq",97:"Al-Qadr",
+  98:"Al-Bayyinah",99:"Az-Zalzalah",100:"Al-Adiyat",101:"Al-Qari'ah",
+  102:"At-Takathur",103:"Al-Asr",104:"Al-Humazah",105:"Al-Fil",106:"Quraysh",
+  107:"Al-Ma'un",108:"Al-Kawthar",109:"Al-Kafirun",110:"An-Nasr",
+  111:"Al-Masad",112:"Al-Ikhlas",113:"Al-Falaq",114:"An-Nas"
+};
+
+// Each Juz as segments: [surahNum, fromAyah, toAyah]
+const JUZ_SEGS = [
+  [[1,1,7],[2,1,141]],
+  [[2,142,252]],
+  [[2,253,286],[3,1,92]],
+  [[3,93,200],[4,1,23]],
+  [[4,24,147]],
+  [[4,148,176],[5,1,81]],
+  [[5,82,120],[6,1,110]],
+  [[6,111,165],[7,1,87]],
+  [[7,88,206],[8,1,40]],
+  [[8,41,75],[9,1,92]],
+  [[9,93,129],[10,1,109],[11,1,5]],
+  [[11,6,123],[12,1,52]],
+  [[12,53,111],[13,1,43],[14,1,52]],
+  [[15,1,99],[16,1,128]],
+  [[17,1,111],[18,1,74]],
+  [[18,75,110],[19,1,98],[20,1,135]],
+  [[21,1,112],[22,1,78]],
+  [[23,1,118],[24,1,64],[25,1,20]],
+  [[25,21,77],[26,1,227],[27,1,55]],
+  [[27,56,93],[28,1,88],[29,1,45]],
+  [[29,46,69],[30,1,60],[31,1,34],[32,1,30],[33,1,30]],
+  [[33,31,73],[34,1,54],[35,1,45],[36,1,27]],
+  [[36,28,83],[37,1,182],[38,1,88],[39,1,31]],
+  [[39,32,75],[40,1,85],[41,1,46]],
+  [[41,47,54],[42,1,53],[43,1,89],[44,1,59],[45,1,37]],
+  [[46,1,35],[47,1,38],[48,1,29],[49,1,18],[50,1,45],[51,1,30]],
+  [[51,31,60],[52,1,49],[53,1,62],[54,1,55],[55,1,78],[56,1,96],[57,1,29]],
+  [[58,1,22],[59,1,24],[60,1,13],[61,1,14],[62,1,11],[63,1,11],[64,1,18],[65,1,12],[66,1,12]],
+  [[67,1,30],[68,1,52],[69,1,52],[70,1,44],[71,1,28],[72,1,28],[73,1,20],[74,1,56],[75,1,40],[76,1,31],[77,1,50]],
+  [[78,1,40],[79,1,46],[80,1,42],[81,1,29],[82,1,19],[83,1,36],[84,1,25],[85,1,22],[86,1,17],[87,1,19],[88,1,26],[89,1,30],[90,1,20],[91,1,15],[92,1,21],[93,1,11],[94,1,8],[95,1,8],[96,1,19],[97,1,5],[98,1,8],[99,1,8],[100,1,11],[101,1,11],[102,1,8],[103,1,3],[104,1,9],[105,1,5],[106,1,4],[107,1,7],[108,1,3],[109,1,6],[110,1,3],[111,1,5],[112,1,4],[113,1,5],[114,1,6]]
+];
+
+const JUZ_DATA = [
+  { juz: 1,  surahs: "Al-Fatiha 1 — Al-Baqarah 141",      arabic: "الجزء ١" },
+  { juz: 2,  surahs: "Al-Baqarah 142 — Al-Baqarah 252",    arabic: "الجزء ٢" },
+  { juz: 3,  surahs: "Al-Baqarah 253 — Aal-Imran 92",      arabic: "الجزء ٣" },
+  { juz: 4,  surahs: "Aal-Imran 93 — An-Nisa 23",          arabic: "الجزء ٤" },
+  { juz: 5,  surahs: "An-Nisa 24 — An-Nisa 147",           arabic: "الجزء ٥" },
+  { juz: 6,  surahs: "An-Nisa 148 — Al-Ma'idah 81",        arabic: "الجزء ٦" },
+  { juz: 7,  surahs: "Al-Ma'idah 82 — Al-An'am 110",       arabic: "الجزء ٧" },
+  { juz: 8,  surahs: "Al-An'am 111 — Al-A'raf 87",         arabic: "الجزء ٨" },
+  { juz: 9,  surahs: "Al-A'raf 88 — Al-Anfal 40",          arabic: "الجزء ٩" },
+  { juz: 10, surahs: "Al-Anfal 41 — At-Tawbah 92",         arabic: "الجزء ١٠" },
+  { juz: 11, surahs: "At-Tawbah 93 — Hud 5",               arabic: "الجزء ١١" },
+  { juz: 12, surahs: "Hud 6 — Yusuf 52",                   arabic: "الجزء ١٢" },
+  { juz: 13, surahs: "Yusuf 53 — Ibrahim 52",               arabic: "الجزء ١٣" },
+  { juz: 14, surahs: "Al-Hijr 1 — An-Nahl 128",            arabic: "الجزء ١٤" },
+  { juz: 15, surahs: "Al-Isra 1 — Al-Kahf 74",             arabic: "الجزء ١٥" },
+  { juz: 16, surahs: "Al-Kahf 75 — Ta-Ha 135",             arabic: "الجزء ١٦" },
+  { juz: 17, surahs: "Al-Anbiya 1 — Al-Hajj 78",           arabic: "الجزء ١٧" },
+  { juz: 18, surahs: "Al-Mu'minun 1 — Al-Furqan 20",       arabic: "الجزء ١٨" },
+  { juz: 19, surahs: "Al-Furqan 21 — An-Naml 55",          arabic: "الجزء ١٩" },
+  { juz: 20, surahs: "An-Naml 56 — Al-Ankabut 45",         arabic: "الجزء ٢٠" },
+  { juz: 21, surahs: "Al-Ankabut 46 — Al-Ahzab 30",        arabic: "الجزء ٢١" },
+  { juz: 22, surahs: "Al-Ahzab 31 — Ya-Sin 27",            arabic: "الجزء ٢٢" },
+  { juz: 23, surahs: "Ya-Sin 28 — Az-Zumar 31",            arabic: "الجزء ٢٣" },
+  { juz: 24, surahs: "Az-Zumar 32 — Fussilat 46",          arabic: "الجزء ٢٤" },
+  { juz: 25, surahs: "Fussilat 47 — Al-Jathiyah 37",       arabic: "الجزء ٢٥" },
+  { juz: 26, surahs: "Al-Ahqaf 1 — Adh-Dhariyat 30",       arabic: "الجزء ٢٦" },
+  { juz: 27, surahs: "Adh-Dhariyat 31 — Al-Hadid 29",      arabic: "الجزء ٢٧" },
+  { juz: 28, surahs: "Al-Mujadilah 1 — At-Tahrim 12",      arabic: "الجزء ٢٨" },
+  { juz: 29, surahs: "Al-Mulk 1 — Al-Mursalat 50",         arabic: "الجزء ٢٩" },
+  { juz: 30, surahs: "An-Naba 1 — An-Nas 6",               arabic: "الجزء ٣٠" },
+];
+
+const PRAYERS = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+
+// Split a Juz into 5 prayer readings by verse count
+function splitJuz(juzIndex) {
+  const segs = JUZ_SEGS[juzIndex];
+  let total = 0;
+  for (const [s, f, t] of segs) total += t - f + 1;
+
+  // Target sizes: first 3 prayers get slightly more, last 2 slightly less
+  const base = Math.floor(total / 5);
+  const remainder = total % 5;
+  const targets = [];
+  for (let i = 0; i < 5; i++) targets.push(base + (i < remainder ? 1 : 0));
+
+  const readings = [];
+  let segIdx = 0, curAyah = segs[0][1];
+
+  for (let r = 0; r < 5; r++) {
+    let need = targets[r];
+    const startS = segs[segIdx][0], startA = curAyah;
+    let endS = startS, endA = startA;
+    let count = 0;
+
+    while (need > 0 && segIdx < segs.length) {
+      const [s, f, t] = segs[segIdx];
+      const avail = t - curAyah + 1;
+
+      if (avail <= need) {
+        count += avail;
+        need -= avail;
+        endS = s; endA = t;
+        segIdx++;
+        if (segIdx < segs.length) curAyah = segs[segIdx][1];
+      } else {
+        endS = s;
+        endA = curAyah + need - 1;
+        count += need;
+        curAyah = endA + 1;
+        need = 0;
+      }
+    }
+
+    readings.push({ startS, startA, endS, endA, count });
+  }
+
+  return readings;
+}
+
+function formatRange(r) {
+  const startName = SN[r.startS];
+  const endName = SN[r.endS];
+  if (r.startS === r.endS) {
+    if (r.startA === r.endA) return `${startName} ${r.startS}:${r.startA}`;
+    return `${startName} ${r.startS}:${r.startA}-${r.endA}`;
+  }
+  return `${startName} ${r.startS}:${r.startA} — ${endName} ${r.endS}:${r.endA}`;
+}
+
+// Ramadan 2026 estimated start: Feb 18, 2026
+const RAMADAN_START = new Date(2026, 1, 18);
+const STORAGE_KEY = "ramadan-quran-progress";
+const EXPAND_KEY = "ramadan-quran-expanded";
+
+function getProgress() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveProgress(p) { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }
+
+function getExpanded() {
+  try { return JSON.parse(localStorage.getItem(EXPAND_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveExpanded(e) { localStorage.setItem(EXPAND_KEY, JSON.stringify(e)); }
+
+function getTodayDayNumber() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const start = new Date(RAMADAN_START); start.setHours(0,0,0,0);
+  const diff = Math.floor((today - start) / 86400000);
+  return (diff >= 0 && diff < 30) ? diff + 1 : -1;
+}
+
+function formatDate(dayIndex) {
+  const d = new Date(RAMADAN_START);
+  d.setDate(d.getDate() + dayIndex);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function render() {
+  const schedule = document.getElementById('schedule');
+  const progress = getProgress();
+  const expanded = getExpanded();
+  const todayNum = getTodayDayNumber();
+  const completedCount = Object.keys(progress).filter(k => progress[k]).length;
+
+  document.getElementById('progressCount').textContent = `${completedCount} / 30`;
+  document.getElementById('progressFill').style.width = `${(completedCount / 30) * 100}%`;
+  document.getElementById('completionMsg').classList.toggle('show', completedCount === 30);
+
+  schedule.innerHTML = '';
+
+  JUZ_DATA.forEach((juz, i) => {
+    const dayNum = i + 1;
+    const isCompleted = !!progress[dayNum];
+    const isToday = dayNum === todayNum;
+    const isExpanded = !!expanded[dayNum];
+    const readings = splitJuz(i);
+
+    const card = document.createElement('div');
+    card.className = 'day-card'
+      + (isCompleted ? ' completed' : '')
+      + (isToday ? ' today' : '')
+      + (isExpanded ? ' expanded' : '');
+
+    const breakdownHTML = readings.map((r, idx) => `
+      <div class="reading-slot">
+        <span class="reading-prayer">${PRAYERS[idx]}</span>
+        <span class="reading-range">${formatRange(r)}</span>
+        <span class="reading-count">${r.count} ayahs</span>
+      </div>
+    `).join('');
+
+    card.innerHTML = `
+      <div class="card-main">
+        <div class="checkbox" data-action="complete">
+          <svg class="checkmark" viewBox="0 0 12 12" fill="none">
+            <path d="M2 6l3 3 5-5" stroke="#1a3c34" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="day-info">
+          <div class="day-top">
+            <span class="day-number">Day ${dayNum} — ${formatDate(i)}</span>
+            <span class="today-badge">Today</span>
+          </div>
+          <div class="day-detail">
+            <strong>Juz ${juz.juz}:</strong> ${juz.surahs}
+          </div>
+        </div>
+        <div class="juz-arabic">${juz.arabic}</div>
+        <div class="expand-arrow">&#9660;</div>
+      </div>
+      <div class="card-breakdown">${breakdownHTML}</div>
+    `;
+
+    // Checkbox click = toggle complete
+    card.querySelector('.checkbox').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const p = getProgress();
+      p[dayNum] = !p[dayNum];
+      saveProgress(p);
+      render();
+    });
+
+    // Card click = toggle expand
+    card.querySelector('.card-main').addEventListener('click', (e) => {
+      if (e.target.closest('.checkbox')) return;
+      const ex = getExpanded();
+      ex[dayNum] = !ex[dayNum];
+      saveExpanded(ex);
+      card.classList.toggle('expanded');
+    });
+
+    schedule.appendChild(card);
+  });
+
+  if (schedule.dataset.scrolled !== 'true') {
+    const todayCard = schedule.querySelector('.day-card.today');
+    if (todayCard) {
+      setTimeout(() => todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+    }
+    schedule.dataset.scrolled = 'true';
+  }
+}
+
+document.getElementById('tipsToggle').addEventListener('click', () => {
+  document.getElementById('tipsCard').classList.toggle('open');
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (confirm('Reset all progress? This cannot be undone.')) {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(EXPAND_KEY);
+    render();
+  }
+});
+
+render();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
+</script>
+
+</body>
+</html>
